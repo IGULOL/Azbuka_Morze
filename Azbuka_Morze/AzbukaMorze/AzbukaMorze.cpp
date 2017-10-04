@@ -68,20 +68,6 @@ map <char, string> AzbukaMorze = {
 	{ '@', "·--·-·" },
 };
 
-bool CheckStr(string s)
-{
-	string valid_let = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz1234567890.,:;()/?! @";
-	int p, i=0, len = s.length();
-	do {
-		s[i] = (char)tolower(s[i]);
-		p = valid_let.find(s[i]);
-		i++;
-	} while ((p >= 0)&&(i <= len));
-	if (i == len+1)
-		return true;
-	else
-		return false;
-}
 //кодирование принятой строки с помощью азбуки Морзе
 string ConvertToAzbukaMorze(string s)
 {
@@ -89,7 +75,11 @@ string ConvertToAzbukaMorze(string s)
 	for (int i = 0; i < s.length(); i++){
 		//если введена прописная буква, переводим в строчную
 		s[i] = (char)tolower(s[i]);
-		res_s = res_s + AzbukaMorze.find(s[i])->second + " ";
+		//проверка символа на существование
+		if (AzbukaMorze.find(s[i])!=AzbukaMorze.end())
+			res_s = res_s + AzbukaMorze.find(s[i])->second + " ";
+		else
+			res_s = res_s + "* ";
 	}
 	return res_s;
 }
@@ -150,19 +140,11 @@ void FileText()
 			cout << "Результат перевода:\n";
 			while (getline(file, str)) 
 			{
-				if (CheckStr(str))
-				{
-					res = ConvertToAzbukaMorze(str);
-					cout << res << endl;
-					res_file << res << endl;
-				}
-				else
-				{
-					cout << "Строка не переведена.\n";
-					res_file << "Строка не переведена.\n";
-				};
+				res = ConvertToAzbukaMorze(str);
+				cout << res << endl;
+				res_file << res << endl;
 			}
-			res_file << "Буквы отделяются одним пробелом, слова - тремя.\n" << endl;
+			res_file << "Буквы отделяются одним пробелом, слова - тремя.\nНепереведенные символы помечаются как *.\n";
 			res_file.close(); //закрываем файл
 			cout << "Результат сохранен в файле Result.txt\n";
 		}
@@ -170,15 +152,10 @@ void FileText()
 			cout << "Результат перевода:\n";
 			while (getline(file, str)) 
 			{
-				if (CheckStr(str))
-				{
-					res = ConvertToAzbukaMorze(str);
-					cout << res << endl;
-				}
-				else
-					cout << "Строка не переведена.\n";
+				res = ConvertToAzbukaMorze(str);
+				cout << res << endl;
 			}
-			cout << "Буквы отделяются одним пробелом, слова - тремя.\n";
+			cout << "Буквы отделяются одним пробелом, слова - тремя.\nНепереведенные символы помечаются как *.\n";
 		}
 		file.close(); //закрываем файл
 	}
@@ -190,20 +167,16 @@ void ConsoleText()
 	string str, res;
 	cout << "Введите текст: \n";
 	getline(cin, str);
-	if (CheckStr(str))
+
+	res = ConvertToAzbukaMorze(str);
+	cout << "Результат перевода:\n" << res << endl << "Буквы отделяются одним пробелом, слова - тремя.\nНепереведенные символы помечаются как *.\n";
+	if (Question("Хотите ли записать результат в файл? (y/n)"))
 	{
-		res = ConvertToAzbukaMorze(str);
-		cout << "Результат перевода:\n" << res << endl << "Буквы отделяются одним пробелом, слова - тремя.\n";
-		if (Question("Хотите ли записать результат в файл? (y/n)"))
-		{
-			ofstream res_file("Result.txt");
-			res_file << "Результат перевода:\n" << res << endl << "Буквы отделяются одним пробелом, слова - тремя.\n";
-			res_file.close(); //закрываем файл
-			cout << "Результат сохранен в файле Result.txt\n";
-		}
+		ofstream res_file("Result.txt");
+		res_file << "Результат перевода:\n" << res << endl << "Буквы отделяются одним пробелом, слова - тремя.\nНепереведенные символы помечаются как *.\n";
+		res_file.close(); //закрываем файл
+		cout << "Результат сохранен в файле Result.txt\n";
 	}
-	else
-		cout << "Строка не переведена.\n";
 }
 
 int main()

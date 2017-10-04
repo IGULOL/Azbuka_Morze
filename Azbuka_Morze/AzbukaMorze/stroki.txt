@@ -1,4 +1,4 @@
 Привет 
 Пушистые коты
 FileS
-StrInG
+StrInG, ~~~ 
